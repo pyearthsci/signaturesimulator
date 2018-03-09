@@ -42,8 +42,9 @@ missions respectively). Here we are interested in reflectance, so set the follow
     sim.run()
 
 .. note::  Currently the passive optical model will only work if the signaturesimulator is installed on a linux machine,
-    due to the packaged Semi-Discrete binaries. We are working to bring out a version compatiable with Windows and Mac OSx.
-    The active microwave model is usable on any architecture.
+    due to the packaged Semi-Discrete binaries. We are working to bring out a version compatiable with Windows and Mac
+    OSx. Please see the next example if you are not on a linux machine. The active microwave model is usable on any
+    architecture.
 
 Once the simulator has finished its run it will right the output to a new spectra class. We can then look at the
 reflectance values for different bands (ordered by wavelength) using the following command::

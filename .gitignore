@@ -1,4 +1,5 @@
 *.nc
+*.pyc
 tests/
 .idea/
 docs/_build
