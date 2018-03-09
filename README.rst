@@ -46,6 +46,7 @@ missions respectively). Here we are interested in reflectance, so set the follow
     OSx. Please see the next example if you are not on a linux machine. The active microwave model is usable on any
     architecture.
 
+
 Once the simulator has finished its run it will right the output to a new spectra class. We can then look at the
 reflectance values for different bands (ordered by wavelength) using the following command::
 
@@ -68,9 +69,12 @@ aquisitions. First we specify the dates and view geometries of our observations 
 
     sim.get_geom = sim.geom_csv(fname=sim.example_s1_geometries)
 
-Here :code:`sim.example_s1_geometries` points to an example csv file included with the signaturesimulator package
-(:code:`'$PYTHONPATH/signaturesimulator/data/geometries/s1_example_const.csv'`), csv files must be of the following
-format::
+Here :code:`sim.example_s1_geometries` points to an example csv file included with the signaturesimulator package found
+here::
+
+$PYTHONPATH/signaturesimulator/data/geometries/s1_example_const.csv
+
+Any geometry csv file must be of the following format::
 
     # date, vza, vaa, sza, saa
     2016/01/03 05:23,34.3773946043,100.545700717,105.298744327,107.406448412
