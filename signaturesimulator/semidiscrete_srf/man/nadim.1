@@ -1,0 +1,169 @@
+.TH nadim 1 "May 2004" "rsu" \" -*- nroff -*-
+.SH NAME 
+nadim \- semi-discrete canopy reflectance model
+.br
+.SH SYNOPSIS
+.B nadim
+[\-LAI \fI\|n\|\fR] [\-lad \fI\|n\|\fR] [\-lrad \fI\|n\|\fR] [\-hc \fI\|n\|\fR] [\-rl \fI\|n\|\fR] [\-tl \fI\|n\|\fR] 
+[\-rs \fI\|n\|\fR] [\-rsl[1/2/3/4] \fI\|n\|\fR] [\-cAb \fI\|n\|\fR] [\-cW \fI\|n\|\fR] [\-cP \fI\|n\|\fR] 
+[\-cC \fI\|n\|\fR] [\-N \fI\|n\|\fR] < in_file 
+.br 
+.SH DESCRIPTION
+.br
+NADIM is a semi-discrete canopy reflectance model. First order scattering is dealt with explicitly 
+and succesive orders of scattering are represented by a turbid medium model. The version of the code
+documented in this manual page has been coupled with prospect(1) (to provide leaf reflectance) and the
+soil reflectance functions described by Price. The input file has been adapted to that it has the
+same format as the kuusk(1) CRM code.
+.SH PROGRAM OTIONS
+.IP "-u " 9
+Print a brief usage message.
+.SH NADIM MODEL OPTIONS
+.IP "-LAI \fI\|n\|\fR" 9
+Set the canopy Leaf Area Index to \fI\|n\|\fR.
+.br
+.IP "-lad \fI\|n\|\fR" 9
+Set the canopy leaf angle distribution to \fI\|n\|\fR, where valid options are: 
+.br
+
+1 - Planophile
+.br
+2 - Erectophile
+.br
+3 - Plagiophile
+.br
+4 - Extremeophile
+.br
+5 - Uniform
+.IP "-hc \fI\|n\|\fR" 9
+Set the height of the canopy, in meters, to \fI\|n\|\fR.
+.br
+.IP "-lrad \fI\|n\|\fR" 9
+Set the leaf radius, in meters, to \fI\|n\|\fR.
+.br
+.IP "-rl \fI\|n\|\fR" 9
+Set the leaf reflectance to \fI\|n\|\fR. This option switches prospect OFF: any prospect options 
+passed are ignored.
+.br
+.IP "-tl \fI\|n\|\fR" 9
+Set the leaf transimittance to \fI\|n\|\fR. This option switches prospect OFF: any prospect options 
+passed are ignored.
+.br
+.IP "-rl \fI\|n\|\fR" 9
+Set the soil reflectance to \fI\|n\|\fR. This option switches the calculation of the soil reflectance
+from the Price vectors OFF: any Price options will be ignored.
+.SH PRICE SOIL OPTIONS
+.IP "-rsl\fI\|N\fR\| \fI\|n\|\fR" 9
+Set the weight of the \fI\|N\fR\|th soil reflectance vector to \fI\|n\|\fR. Valid values of \fI\|N\fR\|
+are {1,2,3,4}.
+.SH PROSPECT OPTIONS
+.IP "-cab \fI\|n\|\fR" 9
+Set the leaf chlorophyl concentration (ug/cm2) to \fI\|n\|\fR.
+.br
+.IP "-cw \fI\|n\|\fR" 9
+Set the equivelant water thickness of the leaf (cm) to \fI\|n\|\fR.
+.br
+.IP "-cp \fI\|n\|\fR" 9
+Set the leaf protein content to (g/cm2) to \fI\|n\|\fR.
+.br
+.IP "-cc \fI\|n\|\fR" 9
+Set the leaf cellulose + lignin content (g/cm2) to \fI\|n\|\fR.
+.br
+.IP "-N \fI\|n\|\fR" 9
+Set effective number of layer insde the leaf to \fI\|n\|\fR.
+.SH ADDITIONAL OUPUT OPTIONS
+The following options print their parameters after the directional reflectances, on the same line, 
+for each set of angles. They are always printed out in the order albedo, fapar, transmission
+regardless of the order they appear on the command line. For each, one value is output per wavelength. So, 
+for example, with two wavelengths and the fapar and transmission options set the output for one line would be:
+vza vaa sza saa rho1 rho1 fapar1 fapar2 trans1 trans2.
+.IP "-albedo" 9
+Output the spectral albedo for each wavelength.
+.br
+.IP "-fapar" 9
+output the spectral fAPAR (fAR?) for each wavelength.
+.br
+.IP "-trans" 9
+output the transmission below the canopy for each wavelength.
+.SH INPUT FILE FORMAT
+The input file contains on the first line, the number of angular samples, followed (on the same line) by the 
+number of wavelengths for which reflectance is to be simulated, followed by the wavelengths in nm. The following 
+lines should contain the viewing and illumination angles for each sample in degrees, in the order vzen vaz szen saz. 
+The output is then the same as input, but with the simulated reflectance in each of the specified bands e.g. for 
+9 samples, at 2 wavelengths (550 and 850nm), with vz varying between -40 and 40 in 10 degree steps, we have an input 
+file as follows:
+.br
+
+9 2 550 850
+.br
+-40 0 0 0
+.br
+-30 0 0 0
+.br
+-20 0 0 0
+.br
+-10 0 0 0
+.br
+0 0 0 0
+.br
+10 0 0 0
+.br
+20 0 0 0
+.br
+30 0 0 0
+.br
+40 0 0 0
+.br
+
+Currently comments are not supported in nadim. This means that some kuusk(1) input (i.e. those with comments in) files 
+file not work.
+.SH REFERENCES
+.br
+
+Gobron N., Pinty B., Verstraete M., Govaerts Y. (1997) A semidiscrete model for the scattering of light by vegetation.
+Journal of Geophysical Research. vol 102. no D8. 9431-9446.
+.br
+
+Jacquemoud S., Baret F. (1990), Prospect: a model of leaf optical properties spectra, Remote Sens. Environ., 34:75-91.
+.br
+
+Jacquemoud S., Ustin S.L., Verdebout J., Schmuck G., Andreoli G., Hosgood B. (1995), PROSPECT return, Remote Sens, Environ., in preparation.
+.br
+
+Kuusk, A. (1996) A computer-efficient plant canopy reflectance model, Computers and Geosciencees, 22(2), pp. 149-163.
+
+Price, J. (1990) On the Information Content of Soil Reflectance Spectra, Rem. Sens. Environ. 33:113-121.
+.br
+
+.SH BUGS
+Probably loads...
+.SH SEE ALSO
+kuusk(1), prospect(1)
+.br
+.SH AUTHOR/COPYRIGHT
+Model and (FORTRAN) code:
+.br
+
+Nadine Gobron
+.br
+
+
+C interface, coupling with prospect and Price, and man page:
+.br
+
+Tristan Quaife
+.br
+Remote Sensing Unit
+.br
+Department of Geography, UCL
+.br
+Chandler House
+.br
+2 Wakefield Street
+.br
+London WC1N 1PG
+.br
+(C) University College London, 2004
+.br
+tquaife@geog.ucl.ac.uk
+.br
