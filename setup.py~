@@ -8,29 +8,17 @@ https://github.com/pypa/sampleproject
 from setuptools import setup, find_packages
 # To use a consistent encoding
 from codecs import open
-from os import path
-import subprocess
-from setuptools.command.install import install
+import os
 
-here = path.abspath(path.dirname(__file__))
+here = os.path.abspath(os.path.dirname(__file__))
 
 # Get the long description from the README file
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
+with open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
-class MyInstall(install):
-    def run(self):
-        try:
-            # note cwd - this makes the current directory
-            # the one with the Makefile.
-            print path.join(here,'signaturesimulator/semidiscrete_srf/')
-            subprocess.call(['make'], cwd=path.join(here, 'signaturesimulator/semidiscrete_srf/'))
-        except Exception as e:
-            print e
-            print "Error compiling semiD.c.   Try running 'make'."
-            exit(1)
-        else:
-            install.run(self)
+make_path = os.path.join(here, 'signaturesimulator/semidiscrete_srf')
+os.system ("make clean -C " + make_path)
+os.system ("make -C " + make_path)
 
 # Arguments marked as "Required" below must be included for upload to PyPI.
 # Fields marked as "Optional" may be commented out.
@@ -128,6 +116,4 @@ setup(
         'signaturesimulator': ['data/tle/*', 'data/srf/*', 'data/state_variables/*', 'data/geometries/*', 'sense/*',
                                'sense/dielectric/*', 'sense/surface/*', 'sense/vegetation/*', 'semidiscrete_srf/*']
     },
-
-    cmdclass={'install': MyInstall},
 )

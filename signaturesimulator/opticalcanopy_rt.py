@@ -113,17 +113,12 @@ def canopy_rt_optical_fast(state, geom, resln=1.0, mode='fast'):
 
 
 def passive_optical_rt(state, geom):
-    """A python wrapper to the SemiDiscrete optical
-    canopy RT model of Nadine Gobron. Runs the
-    model for the the whole of its valid spectra
-    range at a resolution set by resln.
+    """Function that simulates reflectances given surface biogeophysical variables and viewing geometries.
 
     :param state: Instance of the StateVector class.
     :type state: instance
     :param geom: Instance of the SensorGeometry class.
     :type geom: instance
-    :param mode: Run semiDiscrete in either fast ('fast') or slow ('slow') mode [optional].
-    :type resln: str
     :return: Instance of the spectra class.
     :rtype: instance
     """
@@ -150,19 +145,26 @@ def passive_optical_rt(state, geom):
 
 
 def run_semidiscrete(soil_m, lai, can_height, vza, vaa, sza, saa, mode='fast'):
-    """A python wrapper to the SemiDiscrete optical
-    canopy RT model of Nadine Gobron. Runs the
-    model for the the whole of its valid spectra
-    range at a resolution set by resln.
+    """A python wrapper to the SemiDiscrete optical canopy RT model of Nadine Gobron.
 
-    :param state: Instance of the StateVector class.
-    :type state: instance
-    :param geom: Instance of the SensorGeometry class.
-    :type geom: instance
+    :param soil_m: soil moisture at specified time (m3 m-3)
+    :type soil_m: float
+    :param lai: Leaf area index at specified time (m2 m-2)
+    :type lai: float
+    :param can_height: canopy height at specified time (m)
+    :type can_height: float
+    :param vza: view zenith angle (degrees)
+    :type vza: float
+    :param vaa: view azimuth angle (degrees)
+    :type vaa: float
+    :param sza: solar zenith angle (degrees)
+    :type sza: float
+    :param saa: solar azimuth angle (degrees)
+    :type saa: float
     :param mode: Run semiDiscrete in either fast ('fast') or slow ('slow') mode [optional].
     :type resln: str
-    :return: Instance of the spectra class.
-    :rtype: instance
+    :return: Reflectance values for specified input.
+    :rtype: array
     """
 
     # generate a tmp file and write geometry into it

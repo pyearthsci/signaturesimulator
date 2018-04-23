@@ -47,7 +47,7 @@ missions respectively). Here we are interested in reflectance, so set the follow
     architecture.
 
 
-Once the simulator has finished its run it will right the output to a new spectra class. We can then look at the
+Once the simulator has finished its run it will write the output to a new spectra class. We can then look at the
 reflectance values for different bands (ordered by wavelength) using the following command::
 
     sim.spectra.refl
@@ -98,7 +98,7 @@ We can now set the radiative transfer model we wish to use and run the simulator
     sim.run_rt = sim.active_microwave
     sim.run()
 
-Once the simulator has finished its run it will right the output to a new backscat class instance. We can see the output
+Once the simulator has finished its run it will write the output to a new backscat class instance. We can see the output
 variables available to us using::
 
     sim.output_variables

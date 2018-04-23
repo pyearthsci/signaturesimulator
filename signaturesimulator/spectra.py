@@ -12,7 +12,7 @@ class UnknownFileType(Exception):
 
 
 class spectra(object):
-    """Spectra class for sentinel simulator.
+    """Class holding spectra information for signaturesimulator.
     """
     def __init__(self, fname=None, ftype="SVC", wavlCol=0, reflCol=1, hdrLines=1):
 

@@ -16,10 +16,10 @@ import math
 from scipy.integrate import dblquad
 
 
-from numba import jit
+# from numba import jit
 
 
-@jit(cache=True,nopython=True)
+#@jit(cache=True,nopython=True)
 def _calc_roughness_spectra_matrix(nx, ny, kl2, nspec, s, acf_type_id):
     """
     calculate roughness spectra
@@ -232,7 +232,7 @@ class I2EM(SurfaceScatter):
         assert False, 'Unknown ACF type'
 
 
-    @jit(cache=True)
+    #@jit(cache=True)
     def _xpol_integralfunc(self, r, phi, *args):
         """
         while the original matlab function
@@ -553,14 +553,14 @@ class Roughness(object):
 
 
 
-@jit(cache=False, nopython=True)
+#@jit(cache=False, nopython=True)
 def _calc_wn_matrix_gauss(rx, ry, nspec, kl2, s):
     wn = np.zeros(nspec)
     for i in xrange(nspec):
         wn[i] = 0.5 *kl2/(i+1.) * np.exp(-kl2*((rx-s)**2. + ry**2.)/(4.*(i+1))) 
     return wn
 
-@jit(cache=False, nopython=True)
+#@jit(cache=False, nopython=True)
 def _calc_wm_matrix_gauss(rx, ry, nspec, kl2, s):
     wm = np.zeros(nspec)
     for i in xrange(nspec):
@@ -585,14 +585,14 @@ class GaussianSpectrum(Roughness):
 
         return _calc_wm_matrix_gauss(rx, ry, nspec, self._kl2, self._s)
 
-@jit(cache=True,nopython=True)
+#@jit(cache=True,nopython=True)
 def _calc_wn_matrix_exp(rx, ry, nspec, kl2, s):
     wn = np.zeros(nspec)
     for i in xrange(nspec):
         wn[i] = (i+1) * kl2 / ((i+1)**2.+kl2*((rx-s)**2. + ry**2.))**1.5
     return wn
 
-@jit(cache=True,nopython=True)
+#@jit(cache=True,nopython=True)
 def _calc_wm_matrix_exp(rx, ry, nspec, kl2, s):
     wm = np.zeros(nspec)
     for i in xrange(nspec):

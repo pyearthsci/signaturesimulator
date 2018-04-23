@@ -6,9 +6,7 @@ import pandas as pd
 
 
 class StateVector:
-    """Class to hold state vector data for optical
-    and microwave canopy RT models.
-
+    """Class to hold state vector data for optical and microwave canopy RT models.
     """
     def __init__(self):
 
