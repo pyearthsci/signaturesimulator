@@ -1,0 +1,23 @@
+&jules_output
+    dump_period = 100
+    nprofiles = 1
+    output_dir = '../output/'
+    run_id = 'test'
+/
+
+&jules_output_profile
+    file_period = 0
+    nvars = 12
+    output_main_run = .true.
+    output_period = 86400
+    output_spinup = .false.
+    output_type = 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M',
+                  'M'
+    profile_name = 'daily'
+    var = 'precip', 'smcl', 't_soil', 'tstar', 'gpp',
+          'lai', 'latent_heat', 'ftl_gb', 't1p5m_gb',
+          'canht', 'npp', 'soil_wet',
+    var_name = 'precip', 'smcl', 't_soil', 'tstar', 'gpp',
+               'lai', 'latent_heat', 'ftl_gb','t1p5m_gb',
+               'canht', 'npp', 'soil_wet',
+/

@@ -2,7 +2,7 @@ import netCDF4 as nc
 import datetime as dt
 import numpy as np
 import warnings
-import pandas as pd
+#import pandas as pd
 
 
 class StateVector:
@@ -35,7 +35,7 @@ def get_state_csv(fname='/data/state_variables/state_example.csv'):
     return state_inst
 
 
-def get_jules_state(nc_file):
+def get_jules_state(nc_file, pft_idx=5):
     """Function that returns a stateVector instance for a given time.
 
     :param date_utc: datetime object of when to extract JULES output.
@@ -48,8 +48,8 @@ def get_jules_state(nc_file):
     nc_dat = nc.Dataset(nc_file, 'r')
     state_inst = StateVector()
     state_inst.date_utc = nc.num2date(nc_dat.variables['time'][:], nc_dat.variables['time'].units).tolist()
-    state_inst.lai = nc_dat.variables['croplai'][:, 0, 0, 0].tolist()  # (m2 m-2)
-    state_inst.can_height = nc_dat.variables['cropcanht'][:, 0, 0, 0].tolist()  # (m)
+    state_inst.lai = nc_dat.variables['lai'][:, pft_idx, 0, 0].tolist()  # (m2 m-2)
+    state_inst.can_height = nc_dat.variables['canht'][:, pft_idx, 0, 0].tolist()  # (m)
     state_inst.soil_moisture = (nc_dat.variables['smcl'][:, 0, 0, 0]/100).tolist() # (kg m-2)
     nc_dat.close()
     return state_inst
@@ -86,10 +86,10 @@ def find_nearest_date_idx(items, pivot):
     return idx, timedelta
 
 
-def get_date_list(year, month=1, days=365):
-    start_date = dt.datetime(year, month, 1, 12, 0)
-    date_list = pd.date_range(start_date, periods=days).tolist()
-    return date_list
+#def get_date_list(year, month=1, days=365):
+#    start_date = dt.datetime(year, month, 1, 12, 0)
+#    date_list = pd.date_range(start_date, periods=days).tolist()
+#    return date_list
 
 
 def read(file_format='jules', file_str=None, year=None):

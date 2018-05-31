@@ -104,7 +104,7 @@ class Simulator(object):
         state_inst = sv.get_state_csv(fname)
         return state_inst
 
-    def state_jules(self, land_cover='crop'):
+    def state_jules(self, land_cover='crop', pft_idx=5):
         """Extracts state variables from either a) a specified JULES netcdf file, or b) a default land cover profile
         from the list: ['crop', 'evergreen', 'broadleaf', 'grassland']
         :param land_cover: Either a filepath to JULES output netcdf file or a string from list:
@@ -115,7 +115,7 @@ class Simulator(object):
         if land_cover in ['crop', 'crop_early', 'crop_late']:
             state_inst = sv.get_jules_state(self.dir_path+'/'+'../data/state_variables/'+land_cover+'.nc')
         else:
-            state_inst = sv.get_jules_state(land_cover)
+            state_inst = sv.get_jules_state(land_cover, pft_idx)
         return state_inst
 
     def geom_default(self, date_utc=dt.datetime(2016, 6, 17, 10, 25), vza=5.5, vaa=286.3, sza=26.8, saa=157.0):

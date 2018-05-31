@@ -1,0 +1,17 @@
+&jules_time
+    timestep_len = 1800, ,
+    main_run_start = '2016-01-01 00:00:00'
+    main_run_end= '2016-12-31 00:00:00',
+    l_leap=   T,
+/
+
+&jules_spinup
+    max_spinup_cycles = 4
+    spinup_start = '2015-01-01 00:00:00'
+    spinup_end = '2015-12-31 21:00:00'
+    terminate_on_spinup_fail = .false.
+    nvars = 2, ,
+    var = 'smcl', 't_soil'
+    tolerance = 1.0, 0.2
+    use_percent = .true., .false.
+/
