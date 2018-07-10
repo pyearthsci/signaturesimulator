@@ -10,8 +10,9 @@ import activemicro_rt as actmicro_rt
 import atmospheric_rt as atmo_rt
 import satellite_geometry as satgeo
 import state_vector as sv
+import f90nml
 
-# Define some example factory functions
+# Define some example factory functions:
 
 
 def single_reflectance(vza=5.5, vaa=286.3, sza=26.8, saa=157.0, lai=3.0, canopy_ht=1.0, soil_m=0.3):
@@ -54,11 +55,20 @@ def multi_backscat(geom_csv='/data/geometries/s1_example_const.csv',
 class Simulator(object):
     """Class to simulate satellite observations.
     """
-    def __init__(self):
+    def __init__(self, site_nml=None):
         """Calculate class attributes.
         """
         # find file path
         self.dir_path = os.path.dirname(os.path.realpath(__file__))
+        # setup site parameter dictionary
+        self.site_param_dic = {'lat':12.88, 'lon': 48.684, 'clay': 0.23, 'sand': 0.27, 'bulk': 1.65, 'freq': 5.405,
+                               's': 0.015, 'lai_coeff': 0.1, 'omega': 0.1, 'mode': 'fast', 'rsl1': 0.2, 'sm_coeff': 0.5,
+                               'cab': 75.0, 'cw': 0.01}
+        # update parameters with values specifed in site.nml
+        if site_nml is not None:
+            self.set_site_params(site_nml)
+        else:
+            self.set_site_params(self.dir_path + '/site.nml')
         # setup land surface state variables
         self.get_land_state = self.state_default()
         # setup geometry for observations
@@ -73,6 +83,7 @@ class Simulator(object):
         self.example_s1_geometries = self.dir_path + '/' + 'data/geometries/s1_example_const.csv'
         self.example_s2_geometries = self.dir_path + '/' + 'data/geometries/s2_example_const.csv'
         self.example_state_variables = self.dir_path + '/' + 'data/state_variables/state_example.csv'
+
 
     def state_default(self, date_utc=dt.datetime(2016, 6, 17, 9, 0), lai=3.0, canopy_ht=1.0, soil_m=0.3):
         """
@@ -151,7 +162,7 @@ class Simulator(object):
         geom_inst = satgeo.get_geom_csv(fname)
         return geom_inst
 
-    def geom_pyoribtal(self, start_date=dt.datetime(2016, 1, 1), num_days=365, lon=12.880, lat=48.684, altitude=0.0,
+    def geom_pyoribtal(self, start_date=dt.datetime(2016, 1, 1), num_days=365, altitude=0.0,
                        sat_mission='S2', tle_file=None):
         """
         Uses pyorbital to calculate sensor geometries for a specified time period and location on the earth
@@ -174,9 +185,23 @@ class Simulator(object):
         mission_dict = {'S2': 'Sentinel-2a', 'S1': 'Sentinel-1b'}
         if tle_file is None:
             tle_file = self.dir_path + "/data/tle/norad_resource_tle.txt"
-        geom_inst = satgeo.get_satellite_geometry(start_date, num_days, lon, lat, alt=altitude,
+        geom_inst = satgeo.get_satellite_geometry(start_date, num_days, self.site_param_dic['lon'],
+                                                  self.site_param_dic['lat'], alt=altitude,
                                                   mission=mission_dict[sat_mission], tleFile=tle_file)
         return geom_inst
+
+    def set_site_params(self, site_nml):
+        """
+        Function that sets values of site_param_dic from values specified in a fortran namelist file
+        :param site_nml: path to fortran nml file
+        :return: None
+        """
+        nml_dic = f90nml.read(site_nml)
+        for key in nml_dic['site_params'].keys():
+            if type(nml_dic['site_params'][key]) == float:
+                self.site_param_dic[key] = nml_dic['site_params'][key]
+            elif type(nml_dic['site_params'][key]) == list:
+                self.site_param_dic[key] = nml_dic['site_params'][key][0]
 
     def passive_optical(self, state, geom,):
         """
@@ -187,7 +212,10 @@ class Simulator(object):
         :type geom: object
         :return: instance of the spectra class
         """
-        spectra = opcan_rt.passive_optical_rt(state, geom)
+        spectra = opcan_rt.passive_optical_rt(state, geom, mode=self.site_param_dic['mode'],
+                                              rsl1=self.site_param_dic['rsl1'],
+                                              sm_coeff=self.site_param_dic['sm_coeff'], cab=self.site_param_dic['cab'],
+                                              cw=self.site_param_dic['cw'])
         return spectra
 
     def active_microwave(self, state, geom,):
@@ -199,7 +227,11 @@ class Simulator(object):
         :type geom: object
         :return: instance of the backscatter class
         """
-        backscat = actmicro_rt.active_microwave_rt(state, geom)
+        backscat = actmicro_rt.active_microwave_rt(state, geom, freq=self.site_param_dic['freq'],
+                                                   s=self.site_param_dic['s'],
+                                                   lai_coeff=self.site_param_dic['lai_coeff'],
+                                                   omega=self.site_param_dic['omega'], clay=self.site_param_dic['clay'],
+                                                   sand=self.site_param_dic['sand'])
         return backscat
 
     def run(self):
@@ -216,7 +248,7 @@ class Simulator(object):
             self.backscat = self.run_rt(self.get_land_state, self.get_geom)
             self.output_variables += self.backscat.__dict__.keys()
 
-    def plot(self, plot_key, band_idx=None):
+    def plot(self, plot_key, band_idx=None, S2=1):
         """
         Function to plot output of simulator after completing a run
         :param plot_key: plot key of variable to plot (must be in self.plot_keys list)
@@ -233,7 +265,11 @@ class Simulator(object):
             elif plot_key == "refl":
                 plt.plot(self.spectra.date_sat_ob, np.array(self.spectra.__dict__["refl"])[:, band_idx], 'o')
                 plt.xlabel('Date')
-                plt.ylabel('Band reflectance')
+                if S2 == 1:
+                    S2_band_labels = ['1', '2', '3', '4', '5', '6', '7', '8', '8a', '9', '10', '11', '12']
+                    plt.ylabel('Band '+S2_band_labels[band_idx]+' reflectance')
+                elif S2 == 0:
+                    plt.ylabel('Band reflectance')
                 plt.show()
             elif self.run_rt == self.active_microwave:
                 plt.plot(self.backscat.date_sat_ob, self.backscat.__dict__[plot_key], 'o')

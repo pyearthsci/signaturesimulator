@@ -14,6 +14,29 @@ import f90nml
 import glob
 
 
+def crop_run_jules(year=2016, sow_date=110, run_id='crop_jules', output_dir='default'):
+    """
+    Factory function running the JULES land surface model and updating the value of sow date for crops.
+    :param year: year to run JULES for, here only 2015 and 2016 available (str)
+    :param sow_date: crop sow date (int)
+    :param run_id: id for model run (str)
+    :param output_dir: directory to store output (str)
+    :return: 'run completed'
+    """
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    example_nml = dir_path + '/' + 'data/jules/example_nml'  # example nml directory bundled with simulator
+    if output_dir == 'default':
+        output_dir = dir_path + '/data/jules/output'  # if default use example directory to store model output
+    jules = Jules(nml_dir= example_nml, print_out = 0)
+    jules.nml_dic['timesteps']['jules_time']['main_run_start'] = str(year) + '-01-01 00:00:00'
+    jules.nml_dic['timesteps']['jules_time']['main_run_end'] = str(year) + '-12-31 21:00:00'
+    jules.nml_dic['ancillaries']['jules_crop_props']['const_val'][2] = sow_date  # set crop sow date
+    jules.nml_dic['output']['jules_output']['run_id'] = run_id  # set run id
+    jules.nml_dic['output']['jules_output']['output_dir'] = output_dir  # set directory to store model output
+    jules.run_jules()
+    return 'run completed'
+
+
 class Jules():
     """Class to read in nml files and run JULES.
 
@@ -66,9 +89,8 @@ class Jules():
         # user doesn't have to remember to...
 
         # run JULES
-        dir_path = os.path.dirname(os.path.realpath(__file__))
         cwd = os.getcwd()
-        os.chdir(dir_path+'/'+self.nml_dir)
+        os.chdir(self.nml_dir)
         self.write_nml()
         cmd = []
         cmd.append(self.jules)
@@ -104,9 +126,8 @@ class Jules():
 
         # write all the nml files here so the
         # user doesn't have to remember to...
-        dir_path = os.path.dirname(os.path.realpath(__file__))
         cwd = os.getcwd()
-        os.chdir(dir_path+'/'+self.nml_dir)
+        os.chdir(self.nml_dir)
         self.write_nml()
 
         # run JULES

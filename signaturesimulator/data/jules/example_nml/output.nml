@@ -1,8 +1,8 @@
 &jules_output
     dump_period = 100
     nprofiles = 1
-    output_dir = '../output/'
-    run_id = 'test'
+    output_dir = '/home/if910917/projects/signaturesimulator/signaturesimulator/data/jules/output'
+    run_id = '2015'
 /
 
 &jules_output_profile
@@ -14,10 +14,8 @@
     output_type = 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M',
                   'M'
     profile_name = 'daily'
-    var = 'precip', 'smcl', 't_soil', 'tstar', 'gpp',
-          'lai', 'latent_heat', 'ftl_gb', 't1p5m_gb',
-          'canht', 'npp', 'soil_wet',
-    var_name = 'precip', 'smcl', 't_soil', 'tstar', 'gpp',
-               'lai', 'latent_heat', 'ftl_gb','t1p5m_gb',
-               'canht', 'npp', 'soil_wet',
+    var = 'precip', 'smcl', 't_soil', 'tstar', 'gpp', 'lai', 'latent_heat',
+          'ftl_gb', 't1p5m_gb', 'canht', 'npp', 'soil_wet'
+    var_name = 'precip', 'smcl', 't_soil', 'tstar', 'gpp', 'lai', 'latent_heat',
+               'ftl_gb', 't1p5m_gb', 'canht', 'npp', 'soil_wet'
 /

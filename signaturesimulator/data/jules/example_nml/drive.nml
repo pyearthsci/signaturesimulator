@@ -5,8 +5,9 @@
     data_period = 10800
     file = '../jules_data/wallerfing_met_2015_2016_3hr.dat'
     nvars = 8
-    var=  'sw_down' 'lw_down' 'tot_rain' 'tot_snow' 't' 'wind' 'pstar' 'q',
-    interp=  'nf' 'nf' 'nf' 'nf' 'i' 'i' 'i' 'i',
+    var = 'sw_down', 'lw_down', 'tot_rain', 'tot_snow', 't', 'wind', 'pstar',
+          'q'
+    interp = 'nf', 'nf', 'nf', 'nf', 'i', 'i', 'i', 'i'
     l_daily_disagg = .false.
     l_imogen = .false.
     l_perturb_driving = .false.

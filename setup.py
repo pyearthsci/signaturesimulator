@@ -117,7 +117,8 @@ setup(
                       'pyorbital',
                       'mock',
                       'matplotlib',
-                      'netCDF4'],  # Optional
+                      'netCDF4'
+                      'f90nml'],  # Optional
 
     # If there are data files included in your packages that need to be
     # installed, specify them here.

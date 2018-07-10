@@ -28,7 +28,7 @@
     use_file = .false., .false., .false.
     var = 'cropttveg', 'cropttrep', 'cropsowdate'
     var_name = ''
-    const_val = 694.1, 1200.0, 110
+    const_val = 846.2, 908.4, 110
 /
 
 &jules_irrig

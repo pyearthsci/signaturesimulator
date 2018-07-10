@@ -1,8 +1,8 @@
 &jules_time
     timestep_len = 1800, ,
-    main_run_start = '2016-01-01 00:00:00'
-    main_run_end= '2016-12-31 00:00:00',
-    l_leap=   T,
+    main_run_start = '2015-01-01 00:00:00'
+    main_run_end = '2015-12-31 21:00:00'
+    l_leap = .true.
 /
 
 &jules_spinup

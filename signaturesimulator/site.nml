@@ -1,0 +1,21 @@
+&site_params
+    # location
+    lat = 12.88  # latitude of site
+    lon = 48.684  # longitude of site
+
+    # microwave sense params
+    freq = 5.405  # frequency (GHz)
+    s = 0.015  # surface rms height (m)
+    lai_coeff = 0.1  # coefficient of lai for which to calculate extinction and volume scattering coefficients
+    omega = 0.1  # coefficient for calculation of volume scattering coefficients
+    clay = 0.23  # fraction soil texture clay
+    sand = 0.27  # fraction soil texture sand
+    bulk = 1.65  # soil bulk density (g cm-3)
+
+    # optical semi discrete params
+    mode = 'fast'  # mode to run semiDiscrete in 'fast' or 'slow'
+    rsl1 = 0.2  # weight of the first soil vector, default: 0.2
+    sm_coeff = 0.5  # weighting of soil moisture impact, bound between (0,1)
+    cab = 75.0  # leaf chlorophyl concentration, default: 75.0
+    cw = 0.01  # equivelant leaf water thickness, default: 0.01
+/
