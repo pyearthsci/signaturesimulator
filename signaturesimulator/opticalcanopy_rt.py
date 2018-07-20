@@ -47,7 +47,7 @@ def passive_optical_rt(state, geom, mode='fast', rsl1=0.2, sm_coeff=0.5, cab=75.
         idx, timedelt = sv.find_nearest_date_idx(state.date_utc, date_utc[1])
         reflectance = run_semidiscrete(state.soil_moisture[idx], state.lai[idx], state.can_height[idx],
                                        geom.vza[date_utc[0]], geom.vaa[date_utc[0]], geom.sza[date_utc[0]],
-                                       geom.saa[date_utc[0]])
+                                       geom.saa[date_utc[0]], mode=mode, rsl1=rsl1, sm_coeff=sm_coeff, cab=cab, cw=cw)
         spect.date_sat_ob.append(date_utc[1])
         spect.date_land_ob.append(state.date_utc[idx])
         spect.soil_moisture.append(state.soil_moisture[idx])
@@ -103,7 +103,8 @@ def run_semidiscrete(soil_m, lai, can_height, vza, vaa, sza, saa, mode='fast', r
     else:
         cmd = dir_path+"/semidiscrete_srf/semiD -srf "+dir_path+"/data/srf/s2a.srf"
     if lai != None:
-        cmd = cmd + " -LAI %f -hc %f -rsl1 %f -cab %f -cw %f" % (lai, can_height, 0.2 * (1. - 0.5 * soil_m), cab, cw)
+        cmd = cmd + " -LAI %f -hc %f -rsl1 %f -cab %f -cw %f" % (lai, can_height, rsl1 * (1. - sm_coeff * soil_m), cab,
+                                                                 cw)
         # Think about soil moisture implementation here
     cmd = cmd + " < %s" % temp_path
     # print cmd

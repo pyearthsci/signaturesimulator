@@ -270,17 +270,17 @@ class Simulator(object):
                     plt.ylabel('Band '+S2_band_labels[band_idx]+' reflectance')
                 elif S2 == 0:
                     plt.ylabel('Band reflectance')
-                plt.show()
+                #plt.show()
             elif self.run_rt == self.active_microwave:
                 plt.plot(self.backscat.date_sat_ob, self.backscat.__dict__[plot_key], 'o')
                 plt.xlabel('Date')
                 plt.ylabel(plot_key)
-                plt.show()
+                #plt.show()
             elif self.run_rt == self.passive_optical:
                 plt.plot(self.spectra.date_sat_ob, self.spectra.__dict__[plot_key], 'o')
                 plt.xlabel('Date')
                 plt.ylabel(plot_key)
-                plt.show()
+                #plt.show()
             else:
                 return "Something went wrong, please check that you have run the simulator and are specifying a valid" \
                        "plot key"
