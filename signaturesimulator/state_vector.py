@@ -19,7 +19,7 @@ class StateVector:
         self.soilAlbedo = None
 
 
-def get_state_csv(fname='/data/state_variables/state_example.csv'):
+def get_state_csv(fname):
     """Function that returns StateVector instance for a given file
     :param fname: Path to file from which to extract data, files must be csv with columns:
      (date, lai, canopy height, soil moisture)
@@ -31,7 +31,7 @@ def get_state_csv(fname='/data/state_variables/state_example.csv'):
     state_inst.date_utc = [dt.datetime.strptime(dd, "%Y/%m/%d %H:%M") for dd in state_dat[:,0]]
     state_inst.lai = [float(lai) for lai in state_dat[:,1]]  # (m2 m-2)
     state_inst.can_height = [float(can_height) for can_height in state_dat[:,2]]  # (m)
-    state_inst.soil_moisture = [float(soil_m) for soil_m in state_dat[:,3]]  # (kg m-2)
+    state_inst.soil_moisture = [float(soil_m) for soil_m in state_dat[:,3]]  # (m-3 m-3)
     return state_inst
 
 
@@ -50,7 +50,7 @@ def get_jules_state(nc_file, pft_idx=5):
     state_inst.date_utc = nc.num2date(nc_dat.variables['time'][:], nc_dat.variables['time'].units).tolist()
     state_inst.lai = nc_dat.variables['lai'][:, pft_idx, 0, 0].tolist()  # (m2 m-2)
     state_inst.can_height = nc_dat.variables['canht'][:, pft_idx, 0, 0].tolist()  # (m)
-    state_inst.soil_moisture = (nc_dat.variables['smcl'][:, 0, 0, 0]/100).tolist() # (kg m-2)
+    state_inst.soil_moisture = (nc_dat.variables['smcl'][:, 0, 0, 0]/100).tolist() # (m-3 m-3)
     nc_dat.close()
     return state_inst
 
@@ -71,7 +71,7 @@ def get_jules_state_old(date_utc, nc_file):
     state_inst.date_utc = nc.num2date(nc_dat.variables['time'][t_idx], nc_dat.variables['time'].units)
     state_inst.lai = nc_dat.variables['croplai'][t_idx, 0, 0, 0]  # (m2 m-2)
     state_inst.can_height = nc_dat.variables['cropcanht'][t_idx, 0, 0, 0]  # (m)
-    state_inst.soil_moisture = nc_dat.variables['smcl'][t_idx, 0, 0, 0]  # (kg m-2)
+    state_inst.soil_moisture = nc_dat.variables['smcl'][t_idx, 0, 0, 0]  # (m-3 m-3)
     nc_dat.close()
     return state_inst
 
@@ -141,7 +141,7 @@ def read_jules(nc_file=None, year=None):
         state_dict[t[1]] = StateVector()
         state_dict[t[1]].lai = nc_dat.variables['croplai'][t_idx[t[0]], 0, 0, 0]  # (m2 m-2)
         state_dict[t[1]].can_height = nc_dat.variables['cropcanht'][t_idx[t[0]], 0, 0, 0]  # (m)
-        state_dict[t[1]].soil_moisture = nc_dat.variables['smcl'][t_idx[t[0]], 0, 0, 0]  # (kg m-2)
+        state_dict[t[1]].soil_moisture = nc_dat.variables['smcl'][t_idx[t[0]], 0, 0, 0]  # (m-3 m-3)
         # state_dict[t[1]].soil_temp = nc_dat.variables['t_soil'][t_idx[t[0]], 0, 0, 0]  # (K)
         # figure out how to add others, which soil albedo to output?
     return state_dict
