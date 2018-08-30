@@ -126,11 +126,10 @@ setup(
     # If using Python 2.6 or earlier, then these have to be included in
     # MANIFEST.in as well.
     package_data={  # Optional
-        'signaturesimulator': ['data/tle/*', 'data/srf/*', 'data/state_variables/*', 'data/geometries/*', 'sense/*.py',
-                               'sense/dielectric/*', 'sense/surface/*', 'sense/vegetation/*', 'semidiscrete_srf/*',
-                               'data/jules/*', 'data/jules/example_nml/*', 'data/jules/jules_data/*',
-                               'data/jules/output/*']
+        'signaturesimulator': ['site.nml', 'data/tle/*', 'data/srf/*', 'data/state_variables/*', 'data/geometries/*',
+                               'sense/*.py', 'sense/dielectric/*', 'sense/surface/*', 'sense/vegetation/*',
+                               'semidiscrete_srf/*', 'semidiscrete_srf/man/*', 'data/jules/*',
+                               'data/jules/example_nml/*', 'data/jules/jules_data/*', 'data/jules/output/*']
     },
-
     cmdclass={'install': MyInstall},
 )

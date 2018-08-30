@@ -50,9 +50,9 @@ def active_microwave_rt(state, geom, freq=5.405, s=0.015, lai_coeff=0.1, omega=0
         backscat.soil_moisture.append(state.soil_moisture[idx])
         backscat.lai.append(state.lai[idx])
         backscat.can_height.append(state.can_height[idx])
-        backscat.hh.append(10 * np.log10(SAR.__dict__['stot']['hh']))
-        backscat.hv.append(10 * np.log10(SAR.__dict__['stot']['hv']))
-        backscat.vv.append(10 * np.log10(SAR.__dict__['stot']['vv']))
+        backscat.hh.append(SAR.__dict__['stot']['hh'])  # backscatter in linear units (m2/m2) to convery to dB use 10*np.log10(backscat_arr)
+        backscat.hv.append(SAR.__dict__['stot']['hv'])
+        backscat.vv.append(SAR.__dict__['stot']['vv'])
     return backscat
 
 
