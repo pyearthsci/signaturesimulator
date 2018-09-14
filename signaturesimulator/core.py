@@ -198,10 +198,7 @@ class Simulator(object):
         """
         nml_dic = f90nml.read(site_nml)
         for key in nml_dic['site_params'].keys():
-            if type(nml_dic['site_params'][key]) == float:
-                self.site_param_dic[key] = nml_dic['site_params'][key]
-            elif type(nml_dic['site_params'][key]) == list:
-                self.site_param_dic[key] = nml_dic['site_params'][key][0]
+            self.site_param_dic[key] = nml_dic['site_params'][key]
 
     def passive_optical(self, state, geom,):
         """
