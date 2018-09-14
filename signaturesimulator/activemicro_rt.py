@@ -9,7 +9,8 @@ from sense import soil as sense_soil
 from sense import canopy as sense_canopy
 
 
-def active_microwave_rt(state, geom, freq=5.405, s=0.015, lai_coeff=0.1, omega=0.1, clay=0.23, sand=0.27, bulk=1.65):
+def active_microwave_rt(state, geom, freq=5.405, can_mod='turbid_rayleigh', surf_mod='Oh92', s=0.015, lai_coeff=0.1,
+                        omega=0.1, clay=0.23, sand=0.27, bulk=1.65):
     """
     Function that simulates SAR backscattering, given surface biogeophysical variables and viewing geometries
     :param state: instance of StateVector class
@@ -44,7 +45,8 @@ def active_microwave_rt(state, geom, freq=5.405, s=0.015, lai_coeff=0.1, omega=0
     for date_utc in enumerate(geom.date_utc):
         idx, timedelt = sv.find_nearest_date_idx(state.date_utc, date_utc[1])
         SAR = run_sense(state.soil_moisture[idx], state.lai[idx], state.can_height[idx], geom.vza[date_utc[0]],
-                        freq=freq, s=s, lai_coeff=lai_coeff, omega=omega, clay=clay, sand=sand, bulk=bulk)
+                        freq=freq, stype=can_mod, surf=surf_mod, s=s, lai_coeff=lai_coeff, omega=omega,
+                        clay=clay, sand=sand, bulk=bulk)
         backscat.date_sat_ob.append(date_utc[1])
         backscat.date_land_ob.append(state.date_utc[idx])
         backscat.soil_moisture.append(state.soil_moisture[idx])
