@@ -112,7 +112,7 @@ class Simulator(object):
         :type fname: str
         :return: instance of StateVector class
         """
-        state_inst = sv.get_state_csv(fname, dt_fmt=date_fmt)
+        state_inst = sv.get_state_csv(fname, fmt=date_fmt)
         return state_inst
 
     def state_jules(self, land_cover='crop', pft_idx=5):
@@ -159,7 +159,7 @@ class Simulator(object):
         :type fname: str
         :return: instance of SensorGeometry class
         """
-        geom_inst = satgeo.get_geom_csv(fname, dt_fmt=date_fmt)
+        geom_inst = satgeo.get_geom_csv(fname, fmt=date_fmt)
         return geom_inst
 
     def geom_pyoribtal(self, start_date=dt.datetime(2016, 1, 1), num_days=365, altitude=0.0,
