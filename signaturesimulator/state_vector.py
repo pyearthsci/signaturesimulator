@@ -19,7 +19,7 @@ class StateVector:
         self.soilAlbedo = None
 
 
-def get_state_csv(fname):
+def get_state_csv(fname, fmt='%Y/%m/%d %H:%M'):
     """Function that returns StateVector instance for a given file
     :param fname: Path to file from which to extract data, files must be csv with columns:
      (date, lai, canopy height, soil moisture)
@@ -28,7 +28,7 @@ def get_state_csv(fname):
     """
     state_dat = np.loadtxt(fname, delimiter=',', dtype='str')
     state_inst = StateVector()
-    state_inst.date_utc = [dt.datetime.strptime(dd, "%Y/%m/%d %H:%M") for dd in state_dat[:,0]]
+    state_inst.date_utc = [dt.datetime.strptime(dd, fmt) for dd in state_dat[:,0]]
     state_inst.lai = [float(lai) for lai in state_dat[:,1]]  # (m2 m-2)
     state_inst.can_height = [float(can_height) for can_height in state_dat[:,2]]  # (m)
     state_inst.soil_moisture = [float(soil_m) for soil_m in state_dat[:,3]]  # (m-3 m-3)

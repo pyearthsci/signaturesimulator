@@ -24,7 +24,7 @@ class SensorGeometry:
         print(self.date_utc, self.vza, self.vaa, self.sza, self.saa)
 
 
-def get_geom_csv(fname='/data/geometries/s2_example.csv'):
+def get_geom_csv(fname='/data/geometries/s2_example.csv', fmt='%Y/%m/%d %H:%M'):
     """Function that returns StateVector instance for a given file
     :param fname: Path to file from which to extract data, files must be csv with columns:
      (date, lai, canopy height, soil moisture)
@@ -33,7 +33,7 @@ def get_geom_csv(fname='/data/geometries/s2_example.csv'):
     """
     geom_dat = np.loadtxt(fname, delimiter=',', dtype='str')
     geom_inst = SensorGeometry()
-    geom_inst.date_utc = [dt.datetime.strptime(dd, "%Y/%m/%d %H:%M") for dd in geom_dat[:,0]]
+    geom_inst.date_utc = [dt.datetime.strptime(dd, fmt) for dd in geom_dat[:,0]]
     geom_inst.vza = [float(vza) for vza in geom_dat[:,1]]
     geom_inst.vaa = [float(vaa) for vaa in geom_dat[:,2]]
     geom_inst.sza = [float(sza) for sza in geom_dat[:,3]]

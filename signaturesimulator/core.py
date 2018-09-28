@@ -105,14 +105,14 @@ class Simulator(object):
         state_inst.soil_moisture = [soil_m]
         return state_inst
 
-    def state_csv(self, fname):
+    def state_csv(self, fname, date_fmt='%Y/%m/%d %H:%M'):
         """
         Extract data from a .csv file and create a state instance.
         :param fname: Filename and location of .csv to extract data from
         :type fname: str
         :return: instance of StateVector class
         """
-        state_inst = sv.get_state_csv(fname)
+        state_inst = sv.get_state_csv(fname, dt_fmt=date_fmt)
         return state_inst
 
     def state_jules(self, land_cover='crop', pft_idx=5):
@@ -152,14 +152,14 @@ class Simulator(object):
         geom_inst.saa = [saa]
         return geom_inst
 
-    def geom_csv(self, fname):
+    def geom_csv(self, fname, date_fmt='%Y/%m/%d %H:%M'):
         """
         Extracts dates and viewing geomteries from a .csv and creates an instance of the SensorGeometry class
         :param fname: Filename and location of .cvs file containing dates and viewing angles for sensor
         :type fname: str
         :return: instance of SensorGeometry class
         """
-        geom_inst = satgeo.get_geom_csv(fname)
+        geom_inst = satgeo.get_geom_csv(fname, dt_fmt=date_fmt)
         return geom_inst
 
     def geom_pyoribtal(self, start_date=dt.datetime(2016, 1, 1), num_days=365, altitude=0.0,
