@@ -118,6 +118,133 @@ def run_semidiscrete(soil_m, lai, can_height, vza, vaa, sza, saa, mode='fast', r
     return reflectance
 
 
+def passive_optical_fluxes(state, geom, mode='fast', rsl1=0.2, sm_coeff=0.5, cab=75.0, cw=0.01):
+    """Function that simulates reflectances given surface biogeophysical variables and viewing geometries.
+
+    :param state: Instance of the StateVector class.
+    :type state: instance
+    :param geom: Instance of the SensorGeometry class.
+    :type geom: instance
+    :param mode: Run semiDiscrete in either fast ('fast') or slow ('slow') mode [optional].
+    :type resln: str
+    :param rsl1: weight of the first soil vector
+    :type rsl1: float
+    :param sm_coeff: weighting of soil moisture impact, bound between (0,1)
+    :type sm_coeff: float
+    :param cab: leaf chlorophyl concentration
+    :type cab: float
+    :param cw: equivelant leaf water thickness
+    :type cw: float
+    :return: Instance of the spectra class.
+    :rtype: instance
+    """
+    spect = sp.spectra()
+    spect.date_sat_ob = []
+    spect.date_land_ob = []
+    spect.fpr = []
+    spect.alb = []
+
+
+    for date_utc in enumerate(geom.date_utc):
+        idx, timedelt = sv.find_nearest_date_idx(state.date_utc, date_utc[1])
+        fapar, albedo = run_semidiscrete_fluxes(state.soil_moisture[idx], state.lai[idx], state.can_height[idx],
+                                       geom.sza[date_utc[0]], rsl1=rsl1, sm_coeff=sm_coeff, cab=cab, cw=cw)
+        spect.date_sat_ob.append(date_utc[1])
+        spect.date_land_ob.append(state.date_utc[idx])
+        spect.fpr.append(fapar)
+        spect.alb.append(albedo)
+    return spect
+
+
+def run_semidiscrete_fluxes(soil_m, lai, can_height, sza, rsl1=0.2, sm_coeff=0.5, cab=75.0,
+                     cw=0.01):
+    """A python wrapper to the SemiDiscrete optical canopy RT model of Nadine Gobron.
+    :param soil_m: soil moisture at specified time (m3 m-3)
+    :type soil_m: float
+    :param lai: Leaf area index at specified time (m2 m-2)
+    :type lai: float
+    :param can_height: canopy height at specified time (m)
+    :type can_height: float
+    :param sza: solar zenith angle (degrees)
+    :type sza: float
+    :param rsl1: weight of the first soil vector
+    :type rsl1: float
+    :param sm_coeff: weighting of soil moisture impact, bound between (0,1)
+    :type sm_coeff: float
+    :param cab: leaf chlorophyl concentration
+    :type cab: float
+    :param cw: equivelant leaf water thickness
+    :type cw: float
+    :return: fapar & albedo values for specified input.
+    :rtype: array
+    """
+
+    # generate a tmp file and write geometry into it
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    exe = dir_path + "/semidiscrete_srf/semiD"
+    fd, temp_path = mkstemp(prefix='/tmp/senSyntmp__', text=True)
+    tmpFile = os.fdopen(fd, 'w')
+    print >> tmpFile, "0 0 %s 0" % sza
+    tmpFile.close()
+
+    # set up nadim command line
+    cmd = exe+" -fluxes -vis"
+    if lai != None:
+        cmd = cmd + " -LAI %f -hc %f -rsl1 %f -cab %f -cw %f" % (lai, can_height, rsl1 * (1. - sm_coeff * soil_m), cab,
+                                                                 cw)
+    cmd = cmd + " < %s" % temp_path
+
+    # run process
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=sys.stderr, shell=True)
+    out = p.stdout.readlines()
+    p.wait()
+
+    fpr=sp.spectra()
+    alb=sp.spectra()
+
+    for o in out:
+      fpr.wavl=np.append(fpr.wavl,float(o.split()[0]))
+      alb.wavl=np.append(alb.wavl,float(o.split()[0]))
+      fpr.refl=np.append(fpr.refl,float(o.split()[1]))
+      alb.refl=np.append(alb.refl,float(o.split()[2]))
+
+
+    return fpr, alb
+
+
+def run_semidiscrete_fapar_albedo(soil_m, lai, can_height, sza, rsl1=0.2, sm_coeff=0.5, cab=75.0,\
+                                  cw=0.01, solar_spectrum_filename="data/srf/ASTMG173.csv"):
+    """A python wrapper to the SemiDiscrete model which integrates over the wolar spectrum.
+    :param soil_m: soil moisture at specified time (m3 m-3)
+    :type soil_m: float
+    :param lai: Leaf area index at specified time (m2 m-2)
+    :type lai: float
+    :param can_height: canopy height at specified time (m)
+    :type can_height: float
+    :param sza: solar zenith angle (degrees)
+    :type sza: float
+    :param rsl1: weight of the first soil vector
+    :type rsl1: float
+    :param sm_coeff: weighting of soil moisture impact, bound between (0,1)
+    :type sm_coeff: float
+    :param cab: leaf chlorophyl concentration
+    :type cab: float
+    :param cw: equivelant leaf water thickness
+    :type cw: float
+    :return: fapar & albedo values for specified input.
+    :rtype: array
+    """
+
+    spec=sp.spectra(fname=solar_spectrum_filename, ftype="CSV", wavlCol=0, reflCol=3, hdrLines=2)
+    spec.trim(400,701)
+
+    fpr_w, alb_w= run_semidiscrete_fluxes(soil_m, lai, can_height, sza, rsl1, sm_coeff, cab, cw)
+    fpr=sp.convolve(fpr_w,spec)
+    alb=sp.convolve(alb_w,spec)
+
+    return fpr, alb
+
+
 def canopy_rt_optical(state, geom, resln=1.0):
     """A python wrapper to the SemiDiscrete optical
     canopy RT model of Nadine Gobron. Runs the
@@ -218,56 +345,7 @@ def canopy_rt_optical_fast(state, geom, resln=1.0, mode='fast'):
 
 
 if __name__ == "__main__":
-    """This example opens a test output file from the JULES
-    model, reads in LAI data, runs these through the optical RT
-    model at given geometry and convoles the resulting spectra
-    with Sentinel 2 spectra response functions.
-    """
+    fpr, alb = run_semidiscrete_fapar_albedo(0.1, 2.0, 1.0, 30.)
 
-    from matplotlib import pyplot as plt
-
-    # read example LAI data:
-    allLai = netCDF4.Dataset('../testData/crop_germ_gl4.day.nc').variables['lai'][-365:, 5, 0, 0]
-
-    # main classes:
-    state = sv.stateVector()
-    geom = satgeo.sensorGeometry()
-    geom.sza = 30.
-
-    # container for output:
-    allSpect = []
-    allBRF = []
-
-    # orbit revist:
-    revist = 10
-
-    # plotting variables:
-    xpnts = []
-    lgnd = []
-
-    # loop over all states and call the
-    # canopy RT model and convolve the
-    # retruned spectra to S2 bands
-    for (n, L) in enumerate(allLai[::revist]):
-        state.lai = L
-        spect = canopy_rt_optical(state, geom)
-        allSpect.append(sp.sentinel2(spect))
-        allBRF.append(allSpect[n].refl)
-        xpnts.append(n * revist)
-
-    allBRF = np.array(allBRF)
-
-    # sort out legend
-    for i in xrange(len(allBRF[0, :])):
-        lgnd.append('S2 band %d' % (i + 1))
-
-    # do plots:
-    lineObjs = plt.plot(xpnts, allBRF)
-    plt.ylabel('reflectance (BRF)')
-    plt.xlabel('Day of year')
-    plt.xlim([0, 364])
-    for i in xrange(7, len(lineObjs)):
-        lineObjs[i].set_dashes([3, 1])
-    plt.legend(iter(lineObjs), lgnd)
-    plt.show()
-    # plt.savefig('s2Sim_test1.png')
+    print fpr
+    print alb

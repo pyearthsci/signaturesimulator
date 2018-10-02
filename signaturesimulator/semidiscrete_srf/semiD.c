@@ -87,8 +87,6 @@ the file opening and exits with failure if open fails*/
 }
 
 
-
-
 void usage( char *bin_name )
 {
 
@@ -148,7 +146,10 @@ int main( int argc, char **argv )
   float brf[NANGLES][NWAVELS];
   float xrs=0.1, xhc=5.0, xlai=4.0, rpl=0.1, xrl=0.45, xtl=0.5;
   int   lad=2;
+  int   do_fluxes=0, do_vis=0;
 
+  float fapar[NANGLES][NWAVELS], albedo_sys[NANGLES][NWAVELS], trans_total[NANGLES][NWAVELS] ;
+	
   /*leaf spectra file*/
   char    leaf_spectra_file_name[ MAX_LINE_LEN ];
   long    nColsLS, nRowsLS;
@@ -175,7 +176,7 @@ int main( int argc, char **argv )
   int fast_mode=0;
   
   /*get command line options*/ 
-  cl_parser( argc, argv, &xhc, &xlai, &xtl, &lad, &p_vai, &p_cab, &p_cw, &p_cp, &p_cc, &rsl1, &rsl2, &rsl3, &rsl4, srf_file_name, &use_srf, &fast_mode, leaf_spectra_file_name, &use_prospect );
+  cl_parser( argc, argv, &xhc, &xlai, &xtl, &lad, &p_vai, &p_cab, &p_cw, &p_cp, &p_cc, &rsl1, &rsl2, &rsl3, &rsl4, srf_file_name, &use_srf, &fast_mode, leaf_spectra_file_name, &use_prospect, &do_fluxes, &do_vis );
   
         
   /*read the srf data*/
@@ -254,7 +255,8 @@ int main( int argc, char **argv )
   below becomes band number, rather than wavelength, which makes the code
   a little confusing to read.
   */
-  
+
+  if( do_vis ) nw=301;  
   if( fast_mode && use_srf ) nw=nColsSrf;
   for( w=0; w<nw; w++ ){    
     if( fast_mode && use_srf ){
@@ -274,9 +276,12 @@ int main( int argc, char **argv )
     ================*/
     for( a=0; a<nv; a++ ){
       /*call the FORTRAN routine*/  
-      //printf("**** %f %f %f %f %d %f %f %f %f %f %f\n", theta_i[a], phi_i[a], theta_v[a], phi_v[a], lad, xrs, xhc, xlai, rpl, xrl, xtl );
-      nadimbrf_(&theta_i[a], &phi_i[a], &i , &theta_v[a], &phi_v[a], &lad, &xrs, &xhc, &xlai, &rpl, &xrl, &xtl, &brf[a][w]);
-          
+      if(do_fluxes){
+        nadimbrfe_(&theta_i[a], &phi_i[a], &i , &theta_v[a], &phi_v[a], &lad, &xrs, &xhc, &xlai, &rpl, &xrl, &xtl, &brf[a][w], &fapar[a][w], &albedo_sys[a][w], &trans_total[a][w] );
+      
+      }else{
+        nadimbrf_(&theta_i[a], &phi_i[a], &i , &theta_v[a], &phi_v[a], &lad, &xrs, &xhc, &xlai, &rpl, &xrl, &xtl, &brf[a][w]);
+      }
     }
   }
 
@@ -310,10 +315,16 @@ int main( int argc, char **argv )
   /*If not using SRF convolution print the whole spectra*/
   }else{
     /*print results*/
-    for( w=0; w<NWAVELS; w++ ){ /*wavelengths*/
+    nw=NWAVELS;
+    if(do_vis)nw=301;
+    for( w=0; w<nw; w++ ){ /*wavelengths*/
       printf("%d ",w+400);
       for( a=0; a<nv; a++ ){ /*angles*/
-        printf( "%f ", brf[a][w]);
+        if(do_fluxes){
+          printf( "%f %f", fapar[a][w], albedo_sys[a][w]);
+        }else{
+          printf( "%f ", brf[a][w]);
+        }
       }
       printf( "\n" );
     }
@@ -326,7 +337,7 @@ int main( int argc, char **argv )
 
 
 
-void cl_parser(  argc, argv, xhc, xlai, rpl, lad, p_vai, p_cab, p_cw, p_cp, p_cc, rsl1, rsl2, rsl3, rsl4, srf_file_name, use_srf, fast_mode, leaf_spectra_file_name, use_prospect )
+void cl_parser(  argc, argv, xhc, xlai, rpl, lad, p_vai, p_cab, p_cw, p_cp, p_cc, rsl1, rsl2, rsl3, rsl4, srf_file_name, use_srf, fast_mode, leaf_spectra_file_name, use_prospect, do_fluxes, do_vis )
 int argc ;
 char **argv ;
 float *xhc, *xlai, *rpl ;
@@ -337,6 +348,8 @@ char *srf_file_name ;
 int  *use_srf, *fast_mode ;
 char *leaf_spectra_file_name ;
 int *use_prospect ;
+int *do_fluxes ;
+int *do_vis ;
 {
 
 
@@ -366,6 +379,9 @@ int *use_prospect ;
       else if( !strncasecmp( argv[ i ], "-rsl3", 5 ) )  *rsl3    = atof( argv[ ++i ] ); 
       else if( !strncasecmp( argv[ i ], "-rsl4", 5 ) )  *rsl4    = atof( argv[ ++i ] ); 
   
+      /**/
+      else if( !strncasecmp( argv[ i ], "-fluxes", 5 ) )  *do_fluxes = 1;
+      else if( !strncasecmp( argv[ i ], "-vis", 4 ) )  *do_vis = 1;
       
       /*srf file & fast srf mode*/
       else if( !strncasecmp( argv[ i ], "-fast", 5 ) )  *fast_mode = 1;
