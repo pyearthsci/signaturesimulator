@@ -62,8 +62,9 @@ class Simulator(object):
         self.dir_path = os.path.dirname(os.path.realpath(__file__))
         # setup site parameter dictionary
         self.site_param_dic = {'lat':12.88, 'lon': 48.684, 'clay': 0.23, 'sand': 0.27, 'bulk': 1.65, 'freq': 5.405,
-                               'can_mod': 'turbid_rayleigh', 'surf_mod': 'Oh92', 's': 0.015, 'lai_coeff': 0.1,
-                               'omega': 0.1, 'mode': 'fast', 'rsl1': 0.2, 'sm_coeff': 0.5, 'cab': 75.0, 'cw': 0.01}
+                               'can_mod': 'turbid_rayleigh', 'surf_mod': 'Oh92', 's': 0.015, 'lai_coeff_kv': 0.1,
+                               'lai_coeff_kh': 0.1, 'omega': 0.1, 'mode': 'fast', 'rsl1': 0.2, 'sm_coeff': 0.5,
+                               'cab': 75.0, 'cw': 0.01}
         # update parameters with values specifed in site.nml
         if site_nml is not None:
             self.set_site_params(site_nml)
@@ -228,7 +229,8 @@ class Simulator(object):
                                                    can_mod=self.site_param_dic['can_mod'],
                                                    surf_mod=self.site_param_dic['surf_mod'],
                                                    s=self.site_param_dic['s'],
-                                                   lai_coeff=self.site_param_dic['lai_coeff'],
+                                                   lai_coeff_kv=self.site_param_dic['lai_coeff_kv'],
+                                                   lai_coeff_kh=self.site_param_dic['lai_coeff_kh'],
                                                    omega=self.site_param_dic['omega'], clay=self.site_param_dic['clay'],
                                                    sand=self.site_param_dic['sand'])
         return backscat

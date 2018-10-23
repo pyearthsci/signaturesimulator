@@ -11,7 +11,8 @@
     !microwave sense params
     freq = 5.405  !frequency (GHz)
     s = 0.015  !surface rms height (m)
-    lai_coeff = 0.1  !coefficient of lai for which to calculate extinction and volume scattering coefficients
+    lai_coeff_kv = 0.1  !coefficient of lai for which to calculate extinction and volume scattering coefficients in V pol.
+    lai_coeff_kh = 0.1  !coefficient of lai for which to calculate extinction and volume scattering coefficients in H pol.
     omega = 0.1  !coefficient for calculation of volume scattering coefficients
 
     !optical semi discrete params

@@ -9,8 +9,8 @@ from sense import soil as sense_soil
 from sense import canopy as sense_canopy
 
 
-def active_microwave_rt(state, geom, freq=5.405, can_mod='turbid_rayleigh', surf_mod='Oh92', s=0.015, lai_coeff=0.1,
-                        omega=0.1, clay=0.23, sand=0.27, bulk=1.65):
+def active_microwave_rt(state, geom, freq=5.405, can_mod='turbid_rayleigh', surf_mod='Oh92', s=0.015, lai_coeff_kv=0.1,
+                        lai_coeff_kh=0.1, omega=0.1, clay=0.23, sand=0.27, bulk=1.65):
     """
     Function that simulates SAR backscattering, given surface biogeophysical variables and viewing geometries
     :param state: instance of StateVector class
@@ -21,8 +21,12 @@ def active_microwave_rt(state, geom, freq=5.405, can_mod='turbid_rayleigh', surf
     :type freq: float
     :param s: surface rms height (m)
     :type s: float
-    :param lai_coeff: coefficient of lai for which to calculate extinction and volume scattering coefficients
-    :type lai_coeff: float
+    :param lai_coeff_kv: coefficient of lai for which to calculate extinction and volume scattering coefficients in V
+    polarisation
+    :type lai_coeff_kv: float
+    :param lai_coeff_kh: coefficient of lai for which to calculate extinction and volume scattering coefficients in H
+    polarisation
+    :type lai_coeff_kh: float
     :param omega: coefficient for calculation of volume scattering coefficients
     :type omega: float
     :param clay: soil texture clay fraction
@@ -45,8 +49,8 @@ def active_microwave_rt(state, geom, freq=5.405, can_mod='turbid_rayleigh', surf
     for date_utc in enumerate(geom.date_utc):
         idx, timedelt = sv.find_nearest_date_idx(state.date_utc, date_utc[1])
         SAR = run_sense(state.soil_moisture[idx], state.lai[idx], state.can_height[idx], geom.vza[date_utc[0]],
-                        freq=freq, stype=can_mod, surf=surf_mod, s=s, lai_coeff=lai_coeff, omega=omega,
-                        clay=clay, sand=sand, bulk=bulk)
+                        freq=freq, stype=can_mod, surf=surf_mod, s=s, lai_coeff_kv=lai_coeff_kv,
+                        lai_coeff_kh=lai_coeff_kh, omega=omega, clay=clay, sand=sand, bulk=bulk)
         backscat.date_sat_ob.append(date_utc[1])
         backscat.date_land_ob.append(state.date_utc[idx])
         backscat.soil_moisture.append(state.soil_moisture[idx])
@@ -59,8 +63,8 @@ def active_microwave_rt(state, geom, freq=5.405, can_mod='turbid_rayleigh', surf
 
 
 
-def run_sense(soil_m, lai, can_height, vza, freq=5.405, stype='turbid_rayleigh', surf='Oh92', s=0.015, lai_coeff=0.1,
-              omega=0.1, clay=0.23, sand=0.27, bulk=1.65):
+def run_sense(soil_m, lai, can_height, vza, freq=5.405, stype='turbid_rayleigh', surf='Oh92', s=0.015, lai_coeff_kv=0.1,
+              lai_coeff_kh=0.1, omega=0.1, clay=0.23, sand=0.27, bulk=1.65):
     """
     Function that runs the SenSE SAR ScattEring model given some inputs
     :param soil_m: soil moisture (m3 m-3)
@@ -79,8 +83,12 @@ def run_sense(soil_m, lai, can_height, vza, freq=5.405, stype='turbid_rayleigh',
     :type surf: str
     :param s: surface rms height (m)
     :type s: float
-    :param lai_coeff: coefficient of lai for which to calculate extinction and volume scattering coefficients
-    :type lai_coeff: float
+    :param lai_coeff_kv: coefficient of lai for which to calculate extinction and volume scattering coefficients in V
+    polarisation
+    :type lai_coeff_kv: float
+    :param lai_coeff_kh: coefficient of lai for which to calculate extinction and volume scattering coefficients in H
+    polarisation
+    :type lai_coeff_kh: float
     :param omega: coefficient for calculation of volume scattering coefficients
     :type omega: float
     :param clay: soil texture clay fraction
@@ -97,11 +105,11 @@ def run_sense(soil_m, lai, can_height, vza, freq=5.405, stype='turbid_rayleigh',
     SAR = sense_mod.SingleScatRT(
           surface=sense_soil.Soil(mv=soil_m, f=freq, s=s, clay=clay, sand=sand, bulk=bulk),
           # surface=sense_soil.Soil(eps=self.eps, f=self.freq, s=self.s),
-          canopy=sense_canopy.OneLayer(ke_h=lai_coeff * lai,  # extinction coefficient
-                                       ke_v=lai_coeff * lai,
+          canopy=sense_canopy.OneLayer(ke_h=lai_coeff_kh * lai,  # extinction coefficient
+                                       ke_v=lai_coeff_kv * lai,
                                        d=can_height,
-                                       ks_h=omega * (lai_coeff * lai),  # volume scattering coeff
-                                       ks_v=omega * (lai_coeff * lai)),
+                                       ks_h=omega * (lai_coeff_kh * lai),  # volume scattering coeff
+                                       ks_v=omega * (lai_coeff_kv * lai)),
           models=models,
           theta=np.deg2rad(vza),
           freq=freq)
