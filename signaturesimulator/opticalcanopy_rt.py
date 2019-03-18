@@ -129,6 +129,79 @@ def run_semidiscrete(soil_m, lai, can_height, vza, vaa, sza, saa, mode='fast', r
     return reflectance
 
 
+def run_semidiscrete_test(soil_m, lai, can_height, vza, vaa, sza, saa, mode='fast', rsl1=0.2, sm_coeff=0.5, cab=75.0,
+                     cw=0.01):
+    """A python wrapper to the SemiDiscrete optical canopy RT model of Nadine Gobron.
+
+    :param soil_m: soil moisture at specified time (m3 m-3)
+    :type soil_m: float
+    :param lai: Leaf area index at specified time (m2 m-2)
+    :type lai: float
+    :param can_height: canopy height at specified time (m)
+    :type can_height: float
+    :param vza: view zenith angle (degrees)
+    :type vza: float
+    :param vaa: view azimuth angle (degrees)
+    :type vaa: float
+    :param sza: solar zenith angle (degrees)
+    :type sza: float
+    :param saa: solar azimuth angle (degrees)
+    :type saa: float
+    :param mode: Run semiDiscrete in either fast ('fast') or slow ('slow') mode [optional].
+    :type resln: str
+    :param rsl1: weight of the first soil vector
+    :type rsl1: float
+    :param sm_coeff: weighting of soil moisture impact, bound between (0,1)
+    :type sm_coeff: float
+    :param cab: leaf chlorophyl concentration
+    :type cab: float
+    :param cw: equivelant leaf water thickness
+    :type cw: float
+    :return: Reflectance values for specified input.
+    :rtype: array
+    """
+
+    # generate a tmp file and write geometry into it
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    fd, temp_path = mkstemp(prefix='/tmp/senSyntmp__', text=True)
+    tmpFile = os.fdopen(fd, 'w')
+    print >> tmpFile, "%s %s %s %s" % (vza, vaa, sza, saa)
+    # print "%s %s %s %s" %(geom.vza,geom.vaa,geom.sza,geom.saa)
+    tmpFile.close()
+
+    # set up nadim command line
+    if mode == 'fast':
+        cmd = dir_path+"/semidiscrete_srf/semiD -srf "+dir_path+"/data/srf/s2a.srf -fast"
+    else:
+        cmd = dir_path+"/semidiscrete_srf/semiD -srf "+dir_path+"/data/srf/s2a.srf"
+    if lai != None:
+        cmd = cmd + " -LAI %f -hc %f -rsl1 %f -cab %f -cw %f" % (lai, can_height, rsl1 * (1. - sm_coeff * soil_m), cab,
+                                                                 cw)
+        # Think about soil moisture implementation here
+    cmd = cmd + " < %s" % temp_path
+    # print cmd
+
+    # run process
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+    while True:
+        # Wait for some output, read it and print it.
+        out = p.stdout.readlines()
+        print(out)
+        print(out[0].split())
+
+        # Has the subprocess finished yet?
+        if p.poll() is not None:
+            break
+
+    if p.returncode != 0:
+        print("Exited with error code:", p.returncode)
+    #out = p.stdout.readlines()
+    #p.wait()
+
+    reflectance = out
+    return reflectance
+
+
 def passive_optical_fluxes(state, geom, mode='fast', rsl1=0.2, sm_coeff=0.5, cab=75.0, cw=0.01):
     """Function that simulates reflectances given surface biogeophysical variables and viewing geometries.
 
