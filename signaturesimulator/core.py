@@ -231,8 +231,10 @@ class Simulator(object):
                                                    s=self.site_param_dic['s'],
                                                    lai_coeff_kv=self.site_param_dic['lai_coeff_kv'],
                                                    lai_coeff_kh=self.site_param_dic['lai_coeff_kh'],
-                                                   omega=self.site_param_dic['omega'], clay=self.site_param_dic['clay'],
-                                                   sand=self.site_param_dic['sand'])
+                                                   omega=self.site_param_dic['omega'],
+                                                   clay=self.site_param_dic['clay'],
+                                                   sand=self.site_param_dic['sand'],
+                                                   bulk=self.site_param_dic['bulk'])
         return backscat
 
     def run(self):

@@ -110,9 +110,20 @@ def run_semidiscrete(soil_m, lai, can_height, vza, vaa, sza, saa, mode='fast', r
     # print cmd
 
     # run process
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=sys.stderr, shell=True)
-    out = p.stdout.readlines()
-    p.wait()
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+    while True:
+        # Wait for some output, read it and print it.
+        out = p.stdout.readlines()
+        #print(out)
+
+        # Has the subprocess finished yet?
+        if p.poll() is not None:
+            break
+
+    if p.returncode != 0:
+        print("Exited with error code:", p.returncode)
+    #out = p.stdout.readlines()
+    #p.wait()
 
     reflectance = np.array([float(val) for val in out[0].split()])
     return reflectance
