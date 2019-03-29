@@ -251,7 +251,7 @@ class Simulator(object):
             self.backscat = self.run_rt(self.get_land_state, self.get_geom)
             self.output_variables += self.backscat.__dict__.keys()
 
-    def plot(self, plot_key, band_idx=None, S2=1):
+    def plot(self, plot_key, band_idx=None, S2=1, line_sty='o'):
         """
         Function to plot output of simulator after completing a run
         :param plot_key: plot key of variable to plot (must be in self.plot_keys list)
@@ -266,7 +266,7 @@ class Simulator(object):
             elif plot_key == "refl" and band_idx == None:
                 return "For plot key refl you must also specify a band index using, band_idx=..."
             elif plot_key == "refl":
-                plt.plot(self.spectra.date_sat_ob, np.array(self.spectra.__dict__["refl"])[:, band_idx], 'o')
+                plt.plot(self.spectra.date_sat_ob, np.array(self.spectra.__dict__["refl"])[:, band_idx], line_sty)
                 plt.xlabel('Date')
                 if S2 == 1:
                     S2_band_labels = ['1', '2', '3', '4', '5', '6', '7', '8', '8a', '9', '10', '11', '12']
@@ -275,12 +275,12 @@ class Simulator(object):
                     plt.ylabel('Band reflectance')
                 #plt.show()
             elif self.run_rt == self.active_microwave:
-                plt.plot(self.backscat.date_sat_ob, self.backscat.__dict__[plot_key], 'o')
+                plt.plot(self.backscat.date_sat_ob, self.backscat.__dict__[plot_key], line_sty)
                 plt.xlabel('Date')
                 plt.ylabel(plot_key)
                 #plt.show()
             elif self.run_rt == self.passive_optical:
-                plt.plot(self.spectra.date_sat_ob, self.spectra.__dict__[plot_key], 'o')
+                plt.plot(self.spectra.date_sat_ob, self.spectra.__dict__[plot_key], line_sty)
                 plt.xlabel('Date')
                 plt.ylabel(plot_key)
                 #plt.show()

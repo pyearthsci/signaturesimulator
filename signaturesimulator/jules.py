@@ -15,9 +15,9 @@ import glob
 
 
 def crop_run_jules(year=2016, sow_date=110, run_id='crop_jules', output_dir='default',
-                   jules_exe='/home/if910917/jules/models/jules4.8/build/bin/jules.exe'):
+                   jules_exe='/home/if910917/jules/models/jules4.8/build/bin/jules.exe', print_jules=0):
     """
-    Factory function running the JULES land surface model and updating the value of sow date for crops.
+    Function running the JULES land surface model and updating the value of sow date for crops.
     :param year: year to run JULES for, here only 2015 and 2016 available (str)
     :param sow_date: crop sow date (int)
     :param run_id: id for model run (str)
@@ -28,15 +28,14 @@ def crop_run_jules(year=2016, sow_date=110, run_id='crop_jules', output_dir='def
     example_nml = dir_path + '/' + 'data/jules/example_nml'  # example nml directory bundled with simulator
     if output_dir == 'default':
         output_dir = dir_path + '/data/jules/output'  # if default use example directory to store model output
-    jules = Jules(nml_dir=example_nml, print_out=0, jules_exe=jules_exe)
+    jules = Jules(nml_dir=example_nml, print_out=print_jules, jules_exe=jules_exe)
     jules.nml_dic['timesteps']['jules_time']['main_run_start'] = str(year) + '-01-01 00:00:00'
     jules.nml_dic['timesteps']['jules_time']['main_run_end'] = str(year) + '-12-31 21:00:00'
     jules.nml_dic['ancillaries']['jules_crop_props']['const_val'][2] = sow_date  # set crop sow date
     jules.nml_dic['output']['jules_output']['run_id'] = run_id  # set run id
     jules.nml_dic['output']['jules_output']['output_dir'] = output_dir  # set directory to store model output
     jules.run_jules()
-    print(output_dir+'/'+run_id)
-    return 'run completed'
+    return output_dir+'/'+run_id
 
 
 class Jules():
