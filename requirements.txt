@@ -1,6 +1,6 @@
 pandas==0.16.2
 numpy==1.14.1
-scipy==0.15.1
+scipy==1.10.0
 pyorbital==1.2.0
 mock==1.0.1
 numba==0.37.0
